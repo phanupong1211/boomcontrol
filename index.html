@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Boom Control</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Arial;margin:0;padding:24px;background:#0b1220;color:#fff}
+  .row{display:flex;gap:16px;flex-wrap:wrap}
+  button{
+    flex:1 1 240px; font-size:22px; padding:24px; border-radius:18px; border:0;
+    background:#2d6cdf; color:#fff; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    touch-action:none;
+  }
+  button:active{transform:translateY(1px);opacity:.9}
+  .rev{background:#e04f3f}
+  .status{margin-top:16px;opacity:.75}
+</style>
+<body>
+  <h2>🚿 Boom Control (Momentary)</h2>
+  <div class="row">
+    <button id="fw">Forward (RO1)</button>
+    <button id="rev" class="rev">Reverse (RO2)</button>
+  </div>
+  <div class="status" id="s">ready</div>
+
+<script>
+const BASE = "http://10.28.98.8:1880/:1880"; // ← เปลี่ยนเป็นโฮสต์/พอร์ต Node-RED ของคุณ
+
+function call(endpoint, on){
+  const url = `${BASE}${endpoint}?on=${on ? 1 : 0}`;
+  return fetch(url, {method:"POST"}).then(r=>r.json()).catch(()=>({ok:false}));
+}
+
+function bind(btnId, endpoint){
+  const btn = document.getElementById(btnId);
+  const s = document.getElementById('s');
+  const down = async e => { e.preventDefault(); s.textContent = "sending ON..."; await call(endpoint, true); s.textContent = "ON sent"; }
+  const up   = async e => { e.preventDefault(); s.textContent = "sending OFF..."; await call(endpoint, false); s.textContent = "OFF sent"; }
+  ["pointerdown","touchstart","mousedown"].forEach(ev=>btn.addEventListener(ev, down));
+  ["pointerup","pointercancel","touchend","mouseup","mouseleave"].forEach(ev=>btn.addEventListener(ev, up));
+}
+
+bind("fw",  "/api/ro1");
+bind("rev", "/api/ro2");
+</script>
+</body>
+</html>
