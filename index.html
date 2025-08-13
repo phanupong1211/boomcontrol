@@ -24,24 +24,29 @@
   <div class="status" id="s">ready</div>
 
 <script>
-const BASE = "http://10.28.98.8:1880";
+<script>
+const BASE = "http://10.28.98.8:1880";  // ถูกต้อง
 
-function call(endpoint, on){
-  const url = `${BASE}${endpoint}?on=${on ? 1 : 0}`;
-  return fetch(url, {method:"POST"}).then(r=>r.json()).catch(()=>({ok:false}));
+function call(ro, on) {
+  const url = `${BASE}/boom?ro=${ro}&on=${on ? 1 : 0}`;
+  fetch(url, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => document.getElementById('s').textContent = JSON.stringify(data))
+    .catch(() => document.getElementById('s').textContent = 'Error');
 }
 
-function bind(btnId, endpoint){
-  const btn = document.getElementById(btnId);
-  const s = document.getElementById('s');
-  const down = async e => { e.preventDefault(); s.textContent = "sending ON..."; await call(endpoint, true); s.textContent = "ON sent"; }
-  const up   = async e => { e.preventDefault(); s.textContent = "sending OFF..."; await call(endpoint, false); s.textContent = "OFF sent"; }
-  ["pointerdown","touchstart","mousedown"].forEach(ev=>btn.addEventListener(ev, down));
-  ["pointerup","pointercancel","touchend","mouseup","mouseleave"].forEach(ev=>btn.addEventListener(ev, up));
-}
+[
+  { id: 'fw',  ro: 1 },
+  { id: 'rev', ro: 2 }
+].forEach(b => {
+  const btn = document.getElementById(b.id);
+  const down = e => { e.preventDefault(); call(b.ro, true);  };
+  const up   = e => { e.preventDefault(); call(b.ro, false); };
 
-bind("fw",  "/api/ro1");
-bind("rev", "/api/ro2");
+  ['pointerdown','touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, down));
+  ['pointerup','pointercancel','touchend','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, up));
+});
 </script>
+
 </body>
 </html>
