@@ -24,7 +24,7 @@
   <div class="status" id="s">ready</div>
 
 <script>
-const BASE = "http://10.28.98.8:1880/:1880"; // ← เปลี่ยนเป็นโฮสต์/พอร์ต Node-RED ของคุณ
+const BASE = "http://10.28.98.8:1880";
 
 function call(endpoint, on){
   const url = `${BASE}${endpoint}?on=${on ? 1 : 0}`;
